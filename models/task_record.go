@@ -1,8 +1,11 @@
 package models
 
 import (
+	"fmt"
 	"github.com/ccfos/nightingale/v6/pkg/ctx"
 	"github.com/ccfos/nightingale/v6/pkg/poster"
+	"golang.org/x/sync/errgroup"
+	"sync"
 )
 
 type TaskRecord struct {
@@ -22,6 +25,7 @@ type TaskRecord struct {
 	Args         string `json:"args"`
 	CreateAt     int64  `json:"create_at"`
 	CreateBy     string `json:"create_by"`
+	Status       string `json:"status" gorm:"-"`
 }
 
 func (r *TaskRecord) TableName() string {
@@ -72,7 +76,73 @@ func TaskRecordGets(ctx *ctx.Context, bgids []int64, beginTime int64, createBy, 
 
 	var lst []*TaskRecord
 	err := session.Find(&lst).Error
+
+	if len(lst) > 0 {
+		var taskRecordIds []int64
+		for _, r := range lst {
+			taskRecordIds = append(taskRecordIds, r.Id)
+		}
+
+		statusMap, err := TaskRecordStatus(ctx, taskRecordIds)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, r := range lst {
+			r.Status = statusMap[r.Id]
+		}
+	}
+
 	return lst, err
+}
+
+type TaskHost struct {
+	Id     string `json:"id"`
+	Host   string `json:"host"`
+	Status string `json:"status"`
+}
+
+func TaskRecordStatus(ctx *ctx.Context, taskRecordIds []int64) (map[int64] /*id*/ string /*状态*/, error) {
+	wg := errgroup.Group{}
+	var lock = sync.Mutex{}
+	var ret = make(map[int64]string)
+	for _, id := range taskRecordIds {
+		taskRecordId := id
+
+		wg.Go(func() error {
+			statusList, err := getTaskRecordById(ctx, taskRecordId)
+			if err != nil {
+				return err
+			}
+			status := "success"
+			for _, sta := range statusList {
+				if sta.Status != status {
+					status = sta.Status
+					break
+				}
+			}
+			lock.Lock()
+			ret[taskRecordId] = status
+			lock.Unlock()
+
+			return nil
+		})
+	}
+
+	if err := wg.Wait(); err != nil {
+		return nil, err
+	}
+
+	return ret, nil
+}
+
+func getTaskRecordById(ctx *ctx.Context, taskRecordId int64) ([]TaskHost, error) {
+	tableSuffix := taskRecordId % 100
+	var results []TaskHost
+
+	err := DB(ctx).Table(fmt.Sprintf("task_host_%d", tableSuffix)).Where("id = ?", taskRecordId).Find(&results).Error
+
+	return results, err
 }
 
 // update is_done field

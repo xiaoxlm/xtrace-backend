@@ -38,6 +38,7 @@ require (
 	github.com/toolkits/pkg v1.3.8
 	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1
 	golang.org/x/oauth2 v0.10.0
+	golang.org/x/sync v0.7.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/mysql v1.4.4
