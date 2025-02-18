@@ -129,6 +129,9 @@ func (rt *Router) configNoRoute(r *gin.Engine, fs *http.FileSystem) {
 		arr := strings.Split(c.Request.URL.Path, ".")
 		suffix := arr[len(arr)-1]
 
+		c.String(http.StatusNotFound, "404 not found")
+		return
+
 		switch suffix {
 		case "png", "jpeg", "jpg", "svg", "ico", "gif", "css", "js", "html", "htm", "gz", "zip", "map", "ttf", "md":
 			if !rt.Center.UseFileAssets {
@@ -144,6 +147,7 @@ func (rt *Router) configNoRoute(r *gin.Engine, fs *http.FileSystem) {
 				c.File(path.Join(cwdarr...))
 			}
 		default:
+			// 入口路由？
 			if !rt.Center.UseFileAssets {
 				c.FileFromFS("/", *fs)
 			} else {
