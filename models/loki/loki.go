@@ -28,8 +28,12 @@ func QueryLoki(lokiURL, query string, start, end int64) (*LokiRESP, error) {
 		u.Path = APIPath
 		values := url.Values{} //拼接query参数
 		values.Add(QueryParamsKey, query)
-		values.Add(StartParamsKey, fmt.Sprintf("%d", start))
-		values.Add(EndParamsKey, fmt.Sprintf("%d", end))
+		if start > 0 {
+			values.Add(StartParamsKey, fmt.Sprintf("%d", start))
+		}
+		if end > 0 {
+			values.Add(EndParamsKey, fmt.Sprintf("%d", end))
+		}
 		u.RawQuery = values.Encode()
 
 		// 发送 HTTP GET 请求

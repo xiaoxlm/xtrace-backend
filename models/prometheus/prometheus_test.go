@@ -17,7 +17,7 @@ func TestQueryMetricsRate(t *testing.T) {
 	//query := `ifHCOutOctets_total{exported_instance="10.10.1.89"}`
 	query := `sysDescr`
 
-	got, err := NewPrometheus("http://10.10.1.84:9090").QueryMetrics(ctx, &PromQuery{
+	got, err := NewPrometheus("http://10.129.60.70:9090").QueryMetrics(ctx, &PromQuery{
 		Query: query,
 	})
 	if err != nil {
