@@ -89,10 +89,10 @@ type StorageInfo struct {
 
 func (snmp *SNMP) ListHardWareInfo(ctx context.Context) ([]*HardWareInfo, error) {
 	var (
-		cpuMap     map[InstanceMetaInfo]*CPUBasicInfo
-		memoryMap  map[InstanceMetaInfo]*StorageBasicInfo
-		diskMap    map[InstanceMetaInfo]*StorageBasicInfo
-		sysDescMap map[InstanceMetaInfo]*SysDescInfo
+		cpuMap     = make(map[InstanceMetaInfo]*CPUBasicInfo)
+		memoryMap  = make(map[InstanceMetaInfo]*StorageBasicInfo)
+		diskMap    = make(map[InstanceMetaInfo]*StorageBasicInfo)
+		sysDescMap = make(map[InstanceMetaInfo]*SysDescInfo)
 	)
 	{
 		cpuInfo, err := snmp.ListCPUBasicInfo(ctx)
@@ -132,18 +132,40 @@ func (snmp *SNMP) ListHardWareInfo(ctx context.Context) ([]*HardWareInfo, error)
 			return nil, err
 		}
 
+		var (
+			cpuBasicInfo    = CPUBasicInfo{}
+			memoryBasicInfo = StorageBasicInfo{}
+			diskBasicInfo   = StorageBasicInfo{}
+		)
+		{
+			cpu, ok := cpuMap[*ins]
+			if ok && cpu != nil {
+				cpuBasicInfo = *cpu
+			}
+
+			memory, ok := memoryMap[*ins]
+			if ok && memory != nil {
+				memoryBasicInfo = *memory
+			}
+
+			disk, ok := diskMap[*ins]
+			if ok && disk != nil {
+				diskBasicInfo = *disk
+			}
+		}
+
 		hardWareInfos = append(hardWareInfos, &HardWareInfo{
 			InstanceMetaInfo: *ins,
 			CPU: &CPUInfo{
-				CPUBasicInfo: *cpuMap[*ins],
+				CPUBasicInfo: cpuBasicInfo,
 				UsagePercent: usage.CPUPercent,
 			},
 			Memory: &StorageInfo{
-				StorageBasicInfo: *memoryMap[*ins],
+				StorageBasicInfo: memoryBasicInfo,
 				UsagePercent:     usage.MemoryPercent,
 			},
 			Disk: &StorageInfo{
-				StorageBasicInfo: *diskMap[*ins],
+				StorageBasicInfo: diskBasicInfo,
 				UsagePercent:     usage.DiskPercent,
 			},
 			Interface: interfaces,
@@ -209,7 +231,19 @@ func (snmp *SNMP) ListMemoryBasicInfo(ctx context.Context) (list []*StorageBasic
 func (snmp *SNMP) ListDiskBasicInfo(ctx context.Context) (list []*StorageBasicInfo, error error) {
 	query := `hrStorageSize{hrStorageDescr="/"} * hrStorageAllocationUnits{hrStorageDescr="/"}`
 
-	return snmp.listStorage(ctx, query)
+	list, err := snmp.listStorage(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO 代码优化
+	if len(list) == 0 {
+		query = `hrStorageSize{hrStorageDescr="/etc/hostname"} * hrStorageAllocationUnits{hrStorageDescr="/etc/hostname"}`
+
+		list, err = snmp.listStorage(ctx, query)
+	}
+
+	return list, err
 }
 
 type SysDescInfo struct {

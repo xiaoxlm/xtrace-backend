@@ -7,7 +7,7 @@ import (
 )
 
 func TestSNMP_ListHardWareInfo(t *testing.T) {
-	snmp, err := NewSNMP("http://10.10.1.84:9090")
+	snmp, err := NewSNMP("http://10.10.1.84:30900")
 	if err != nil {
 		t.Fatal(err)
 	}
