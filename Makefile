@@ -47,4 +47,4 @@ build-amd-linux:
 	$(GOBUILD) -o bin/n9e-amd-linux ./cmd/center/main.go
 
 build-image:
-	docker build --no-cache -f Dockerfile -t xtrace-backend:v2.0.4-404 .
+	docker build --no-cache -f Dockerfile -t xtrace-backend:v2.0.5-404 .
