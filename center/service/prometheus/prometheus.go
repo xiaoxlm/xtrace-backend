@@ -19,6 +19,46 @@ type Prometheus struct {
 	redis          storage.Redis
 }
 
+func Init(ctx *ctx.Context, redis storage.Redis) error {
+
+	var identToSwitch = make(map[string]*models.Target)
+	{
+		alreadySwitches, err := models.SimpleTargetGets(ctx, -1, 0, "id", true, map[string]string{
+			"engine_name": "switch",
+		})
+		if err != nil {
+			return err
+		}
+		identToSwitch = models.TargetsToMap(alreadySwitches)
+	}
+
+	var addTargets []*models.Target
+	{
+		prom, err := NewPrometheus(ctx, redis)
+		if err != nil {
+			return err
+		}
+		switchTargets, _, err := prom.SwitchTarget(ctx)
+		if err != nil {
+			return err
+		}
+
+		for _, t := range switchTargets {
+			if _, ok := identToSwitch[t.Ident]; !ok {
+				addTargets = append(addTargets, t)
+			}
+		}
+	}
+
+	if len(addTargets) > 0 {
+		if err := models.TargetCreate(ctx, addTargets); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func NewPrometheus(ctx *ctx.Context, redis storage.Redis) (*Prometheus, error) {
 	sources, err := models.GetDatasourcesGetsBy(ctx, "prometheus", "", "", "enabled")
 
@@ -36,29 +76,31 @@ func NewPrometheus(ctx *ctx.Context, redis storage.Redis) (*Prometheus, error) {
 }
 
 // TODO 优化 交换机
-func (prom *Prometheus) SwitchTarget(ctx *ctx.Context) ([]*models.Target, error) {
+func (prom *Prometheus) SwitchTarget(ctx *ctx.Context) ([]*models.Target, map[string]*models.Target, error) {
 	snmp, err := prometheus.NewSNMP(prom.prometheusAddr)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	switchInfos, err := snmp.ListHardWareInfo(ctx.Ctx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	var list []*models.Target
-	for i, info := range switchInfos {
+	var (
+		list          []*models.Target
+		identToTarget = make(map[string]*models.Target)
+	)
+	for _, info := range switchInfos {
 		if info.InstanceIP == "" {
 			continue
 		}
-
-		list = append(list, &models.Target{
-			Id:         int64(100 + i),
+		target := &models.Target{
+			//Id:         int64(100 + i),
 			Ident:      info.InstanceIP,
 			TagsMap:    map[string]string{"device_type": "Switch", "IBN": info.IBN},
 			HostIp:     info.InstanceIP,
-			EngineName: "default",
+			EngineName: "switch",
 			HostTags:   []string{"device_type=Switch", fmt.Sprintf("IBN=%s", info.IBN)},
 			TargetUp:   2,
 			MemUtil:    info.Memory.UsagePercent,
@@ -69,7 +111,10 @@ func (prom *Prometheus) SwitchTarget(ctx *ctx.Context) ([]*models.Target, error)
 			Offset:     1,
 			RemoteAddr: info.InstanceIP,
 			Interface:  info.Interface,
-		})
+		}
+
+		list = append(list, target)
+		identToTarget[info.InstanceIP] = target
 
 		go func() {
 			if err = info.SetMeta(ctx.Ctx, prom.redis); err != nil {
@@ -78,9 +123,10 @@ func (prom *Prometheus) SwitchTarget(ctx *ctx.Context) ([]*models.Target, error)
 		}()
 	}
 
-	return list, nil
+	return list, identToTarget, nil
 }
 
+// 增加gpu设备信息标识
 func (prom *Prometheus) SupplyGPUDevices(ctx *ctx.Context, targetList []*models.Target) error {
 	gpuMetrics := prometheus.NewGPU(prom.prometheusAddr)
 

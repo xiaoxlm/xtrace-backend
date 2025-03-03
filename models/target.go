@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"log"
 	"sort"
 	"strings"
@@ -225,6 +226,36 @@ func TargetGets(ctx *ctx.Context, limit, offset int, order string, desc bool, op
 		order += " asc"
 	}
 	err := buildTargetWhere(ctx, options...).Order(order).Limit(limit).Offset(offset).Find(&lst).Error
+	if err == nil {
+		for i := 0; i < len(lst); i++ {
+			lst[i].TagsJSON = strings.Fields(lst[i].Tags)
+		}
+	}
+	return lst, err
+}
+
+func SimpleTargetGets(ctx *ctx.Context, limit, offset int, order string, desc bool, equal map[string]string) ([]*Target, error) {
+	var lst []*Target
+	if desc {
+		order += " desc"
+	} else {
+		order += " asc"
+	}
+
+	whereSQL := ""
+	var values []interface{}
+	for col, value := range equal {
+		whereSQL += fmt.Sprintf("%s = ? ", col)
+		values = append(values, value)
+	}
+
+	db := DB(ctx).Model(&Target{})
+
+	if whereSQL != "" {
+		db = db.Where(whereSQL, values...)
+	}
+
+	err := db.Order(order).Limit(limit).Offset(offset).Find(&lst).Error
 	if err == nil {
 		for i := 0; i < len(lst); i++ {
 			lst[i].TagsJSON = strings.Fields(lst[i].Tags)
@@ -650,4 +681,16 @@ func DoMigrateBg(ctx *ctx.Context, bgLabelKey string) error {
 		}
 	}
 	return nil
+}
+
+func TargetCreate(ctx *ctx.Context, targets []*Target) error {
+	return DB(ctx).Create(targets).Error
+}
+
+func TargetsToMap(targets []*Target) map[string]*Target {
+	var ret = make(map[string]*Target)
+	for _, t := range targets {
+		ret[t.Ident] = t
+	}
+	return ret
 }

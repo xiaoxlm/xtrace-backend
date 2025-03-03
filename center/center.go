@@ -3,6 +3,7 @@ package center
 import (
 	"context"
 	"fmt"
+	"github.com/ccfos/nightingale/v6/center/service/prometheus"
 
 	"github.com/ccfos/nightingale/v6/alert"
 	"github.com/ccfos/nightingale/v6/alert/astats"
@@ -33,6 +34,7 @@ import (
 	"github.com/ccfos/nightingale/v6/pushgw/writer"
 	"github.com/ccfos/nightingale/v6/storage"
 	"github.com/ccfos/nightingale/v6/tdengine"
+	"github.com/toolkits/pkg/logger"
 
 	"github.com/flashcatcloud/ibex/src/cmd/ibex"
 )
@@ -109,6 +111,12 @@ func Initialize(configDir string, cryptoKey string) (func(), error) {
 	alert.Start(config.Alert, config.Pushgw, syncStats, alertStats, externalProcessors, targetCache, busiGroupCache, alertMuteCache, alertRuleCache, notifyConfigCache, taskTplCache, dsCache, ctx, promClients, tdengineClients, userCache, userGroupCache)
 
 	writers := writer.NewWriters(config.Pushgw)
+
+	// add switches
+	if err = prometheus.Init(ctx, redis); err != nil {
+		return nil, err
+	}
+	logger.Info("init switches success")
 
 	go version.GetGithubVersion()
 

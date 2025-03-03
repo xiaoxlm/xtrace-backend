@@ -143,11 +143,15 @@ func (rt *Router) targetGets(c *gin.Context) {
 		prom.SupplyGPUDevices(rt.Ctx, list)
 
 		// switch
-		switchList, err := prom.SwitchTarget(rt.Ctx)
+		_, identMap, err := prom.SwitchTarget(rt.Ctx)
 		ginx.Dangerous(err)
-		if len(switchList) > 0 {
-			list = append(list, switchList...)
-			total += int64(len(switchList))
+		if len(identMap) > 0 {
+			for idx, data := range list {
+				if t, ok := identMap[data.Ident]; ok {
+					t.Id = data.Id
+					list[idx] = t
+				}
+			}
 		}
 	}
 
