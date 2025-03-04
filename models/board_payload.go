@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-
 	"github.com/ccfos/nightingale/v6/pkg/ctx"
 )
 
@@ -59,4 +58,25 @@ func BoardPayloadSave(ctx *ctx.Context, id int64, payload string) error {
 		Id:      id,
 		Payload: payload,
 	})
+}
+
+// TODO Panel
+func GetPanelContent(ctx *ctx.Context, id int64, panelID string) (string, error) {
+	var result struct {
+		PanelContent string `gorm:"column:panel_content"`
+	}
+
+	err := DB(ctx).Table("board_payload").
+		Select("JSON_EXTRACT(payload, REPLACE(JSON_UNQUOTE(JSON_SEARCH(payload, 'one', ?, NULL, '$.panels[*].id')), '.id', '')) as panel_content",
+			panelID).Where("id = ?", id).
+		Scan(&result).Error
+
+	if err != nil {
+		return "", err
+	}
+
+	return result.PanelContent, nil
+}
+
+type Panel struct {
 }
