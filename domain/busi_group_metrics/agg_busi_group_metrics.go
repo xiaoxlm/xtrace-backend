@@ -4,8 +4,6 @@ type AggBusiGroupMetrics struct {
 	root *busiGroupMetricsTransformer
 }
 
-// TODO
-func (agg *AggBusiGroupMetrics) FormData() {
-	agg.root.transform()
-	agg.root.getData()
+func (agg *AggBusiGroupMetrics) FormData() (*MetricsWithThresholds, error) {
+	return agg.root.getData()
 }

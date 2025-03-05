@@ -33,6 +33,18 @@ func TargetBusiGroupsGetAll(ctx *ctx.Context) (map[string][]int64, error) {
 	return tgs, nil
 }
 
+func TargetGroupIdsGetByGroupID(ctx *ctx.Context, groupID string) (targetIdent []string, err error) {
+	var lst []*TargetBusiGroup
+	err = DB(ctx).Where("group_id = ?", groupID).Find(&lst).Error
+	if err != nil {
+		return nil, err
+	}
+	for _, tg := range lst {
+		targetIdent = append(targetIdent, tg.TargetIdent)
+	}
+	return
+}
+
 func TargetGroupIdsGetByIdent(ctx *ctx.Context, ident string) ([]int64, error) {
 	var lst []*TargetBusiGroup
 	err := DB(ctx).Where("target_ident = ?", ident).Find(&lst).Error

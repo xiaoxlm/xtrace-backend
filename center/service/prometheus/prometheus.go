@@ -14,6 +14,19 @@ const (
 	CollectLabelDeviceType = "device_type"
 )
 
+func GetPrometheusSource(ctx *ctx.Context) (string, error) {
+	sources, err := models.GetDatasourcesGetsBy(ctx, "prometheus", "", "", "enabled")
+
+	if err != nil {
+		return "", err
+	}
+	if len(sources) < 1 {
+		return "", fmt.Errorf("prometheus data source is empty")
+	}
+
+	return sources[0].HTTPJson.Url, nil
+}
+
 type Prometheus struct {
 	prometheusAddr string
 	redis          storage.Redis
@@ -60,17 +73,13 @@ func Init(ctx *ctx.Context, redis storage.Redis) error {
 }
 
 func NewPrometheus(ctx *ctx.Context, redis storage.Redis) (*Prometheus, error) {
-	sources, err := models.GetDatasourcesGetsBy(ctx, "prometheus", "", "", "enabled")
-
+	promAddr, err := GetPrometheusSource(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if len(sources) < 1 {
-		return nil, fmt.Errorf("prometheus data source is empty")
-	}
 
 	return &Prometheus{
-		prometheusAddr: sources[0].HTTPJson.Url,
+		prometheusAddr: promAddr,
 		redis:          redis,
 	}, nil
 }
