@@ -6,6 +6,7 @@ import (
 	"github.com/ccfos/nightingale/v6/models"
 	prometheus2 "github.com/ccfos/nightingale/v6/models/prometheus"
 	"github.com/ccfos/nightingale/v6/pkg/ctx"
+	"github.com/ccfos/nightingale/v6/pkg/prom"
 	"time"
 )
 
@@ -29,7 +30,7 @@ func FactoryAggBusiGroupMetrics(ctx *ctx.Context, busiGroupID uint, ibn, metricU
 	}
 
 	// 根据表达式获取指标数据
-	var metricsData MetricsFromExpr
+	var metricsData prom.MetricsFromExpr
 	{
 		// 解析表达式
 		exprVO, err := newBusiGroupMetricsExpr(metricsMapping.Expression, ibn, targetIdents)
@@ -43,12 +44,13 @@ func FactoryAggBusiGroupMetrics(ctx *ctx.Context, busiGroupID uint, ibn, metricU
 		}
 
 		// 获取指标数据
+		parsedExpr := exprVO.getParsedExpr()
 		commonValues, err := prometheus2.NewPrometheus(promAddr).BatchQueryRange(ctx.Ctx, []prometheus2.QueryFormItem{
 			{
 				Start: time.Now().Unix(),
 				End:   time.Now().Unix(),
 				Step:  15,
-				Query: exprVO.getParsedExpr(),
+				Query: parsedExpr,
 			},
 		})
 		if err != nil {
@@ -59,7 +61,7 @@ func FactoryAggBusiGroupMetrics(ctx *ctx.Context, busiGroupID uint, ibn, metricU
 		}
 
 		// 转换数据结构
-		tmpMetricsData, err := promCommonModelValue2MetricsData(commonValues)
+		tmpMetricsData, err := prom.PromCommonModelValue(commonValues)
 		if err != nil {
 			return nil, err
 		}

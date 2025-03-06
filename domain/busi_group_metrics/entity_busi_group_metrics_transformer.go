@@ -2,6 +2,7 @@ package busi_group_metrics
 
 import (
 	"fmt"
+	"github.com/ccfos/nightingale/v6/pkg/prom"
 
 	"strconv"
 	"strings"
@@ -12,7 +13,7 @@ import (
 // 将查询出来的指标和 panel 数据结合
 type busiGroupMetricsTransformer struct {
 	metricUniqueID string
-	metricsData    MetricsFromExpr
+	metricsData    prom.MetricsFromExpr
 	panel          *models.Panel
 
 	outputData []*MetricsWithThresholds
@@ -26,7 +27,7 @@ func (trans *busiGroupMetricsTransformer) check() error {
 	return nil
 }
 
-func (trans *busiGroupMetricsTransformer) getColor(mValue MetricsValues) (string, error) {
+func (trans *busiGroupMetricsTransformer) getColor(mValue prom.MetricsValues) (string, error) {
 	var (
 		color         string
 		thresholdsLen = len(trans.panel.Options.Thresholds.Steps)
@@ -90,9 +91,8 @@ func (trans *busiGroupMetricsTransformer) listData() ([]*MetricsWithThresholds, 
 }
 
 type MetricsWithThresholds struct {
-	MetricUniqueID string `json:"metricUniqueID"`
-	HostIP         string `json:"hostIP"`
-	Metrics        MetricsValues `json:"metrics"`
-	Color          string        `json:"color"`
+	MetricUniqueID string             `json:"metricUniqueID"`
+	HostIP         string             `json:"hostIP"`
+	Metrics        prom.MetricsValues `json:"metrics"`
+	Color          string             `json:"color"`
 }
-

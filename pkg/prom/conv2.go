@@ -1,8 +1,7 @@
-package busi_group_metrics
+package prom
 
 import (
 	"fmt"
-
 	"github.com/prometheus/common/model"
 	"github.com/sirupsen/logrus"
 )
@@ -19,11 +18,11 @@ type MetricsValues struct {
 	Timestamp int64  `json:"timestamp"`
 }
 
-func promCommonModelValue2MetricsData(promValues []model.Value) ([]MetricsFromExpr, error) {
+func PromCommonModelValue(promValues []model.Value) ([]MetricsFromExpr, error) {
 	var ret []MetricsFromExpr
 
 	for _, result := range promValues {
-		mData, err := parseModelValue2metricsData(result)
+		mData, err := parseModelValue2MetricsData(result)
 		if err != nil {
 			return nil, err
 		}
@@ -34,7 +33,7 @@ func promCommonModelValue2MetricsData(promValues []model.Value) ([]MetricsFromEx
 	return ret, nil
 }
 
-func parseModelValue2metricsData(commonModelValue model.Value) (MetricsFromExpr, error) {
+func parseModelValue2MetricsData(commonModelValue model.Value) (MetricsFromExpr, error) {
 	var ret MetricsFromExpr
 	switch commonModelValue.Type() {
 	case model.ValScalar:

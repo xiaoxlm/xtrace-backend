@@ -36,9 +36,28 @@ func init() {
 }
 
 func TestListBusiGroupMetrics(t *testing.T) {
-	data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", "cpu_util")
-	if err != nil {
-		t.Fatal(err)
-	}
-	util.LogJSON(data)
+	t.Run("cpu_util", func(t *testing.T) {
+		data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", "cpu_util")
+		if err != nil {
+			t.Fatal(err)
+		}
+		util.LogJSON(data)
+	})
+
+	t.Run("mem_util", func(t *testing.T) {
+		data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", "mem_util")
+		if err != nil {
+			t.Fatal(err)
+		}
+		util.LogJSON(data)
+	})
+
+	t.Run("gpu_util", func(t *testing.T) {
+		data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", "gpu_util")
+		if err != nil {
+			t.Fatal(err)
+		}
+		util.LogJSON(data)
+	})
+
 }
