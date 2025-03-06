@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/ccfos/nightingale/v6/domain/busi_group_metrics"
+	"github.com/ccfos/nightingale/v6/center/controller"
 	"github.com/gin-gonic/gin"
 	"github.com/toolkits/pkg/ginx"
 )
@@ -17,10 +17,7 @@ func (rt *Router) listBusiGroupMetrics(ctx *gin.Context) {
 	err := ctx.ShouldBindUri(&params)
 	ginx.Dangerous(err)
 
-	agg, err := busi_group_metrics.FactoryAggBusiGroupMetrics(rt.Ctx, params.BusiGroupID, params.IBN, params.MetricUniqueID)
-	ginx.Dangerous(err)
-
-	data, err := agg.FormData()
+	data, err := controller.ListBusiGroupMetrics(rt.Ctx, params.BusiGroupID, params.IBN, params.MetricUniqueID)
 	ginx.Dangerous(err)
 
 	ginx.NewRender(ctx).Data(gin.H{

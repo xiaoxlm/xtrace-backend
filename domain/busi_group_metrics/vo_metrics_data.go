@@ -6,9 +6,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type metricsDataFromExpr []metricsData // 一个表达式得到的数据
+type metricsFromExpr []metricsInfo // 一个表达式得到的数据
 
-type metricsData struct {
+type metricsInfo struct {
 	metric map[string]string
 	values []metricsValues // 时序数值
 }
@@ -18,8 +18,8 @@ type metricsValues struct {
 	timestamp int64
 }
 
-func promCommonModelValue2MetricsData(promValues []model.Value) ([]metricsDataFromExpr, error) {
-	var ret []metricsDataFromExpr
+func promCommonModelValue2MetricsData(promValues []model.Value) ([]metricsFromExpr, error) {
+	var ret []metricsFromExpr
 
 	for _, result := range promValues {
 		mData, err := parseModelValue2metricsData(result)
@@ -33,8 +33,8 @@ func promCommonModelValue2MetricsData(promValues []model.Value) ([]metricsDataFr
 	return ret, nil
 }
 
-func parseModelValue2metricsData(commonModelValue model.Value) (metricsDataFromExpr, error) {
-	var ret metricsDataFromExpr
+func parseModelValue2metricsData(commonModelValue model.Value) (metricsFromExpr, error) {
+	var ret metricsFromExpr
 	switch commonModelValue.Type() {
 	case model.ValScalar:
 		logrus.Warnf("need to parse 'Scalar' type value")
@@ -56,7 +56,7 @@ func parseModelValue2metricsData(commonModelValue model.Value) (metricsDataFromE
 				m[string(k)] = string(v)
 			}
 
-			ret = append(ret, metricsData{
+			ret = append(ret, metricsInfo{
 				metric: m,
 				values: values,
 			})

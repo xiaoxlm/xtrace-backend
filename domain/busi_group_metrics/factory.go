@@ -1,6 +1,7 @@
 package busi_group_metrics
 
 import (
+	"fmt"
 	"github.com/ccfos/nightingale/v6/center/service/prometheus"
 	"github.com/ccfos/nightingale/v6/models"
 	prometheus2 "github.com/ccfos/nightingale/v6/models/prometheus"
@@ -28,7 +29,7 @@ func FactoryAggBusiGroupMetrics(ctx *ctx.Context, busiGroupID uint, ibn, metricU
 	}
 
 	// 根据表达式获取指标数据
-	var metricsValue []metricsData
+	var metricsData metricsFromExpr
 	{
 		// 解析表达式
 		exprVO, err := newBusiGroupMetricsExpr(metricsMapping.Expression, ibn, targetIdents)
@@ -53,12 +54,17 @@ func FactoryAggBusiGroupMetrics(ctx *ctx.Context, busiGroupID uint, ibn, metricU
 		if err != nil {
 			return nil, err
 		}
+		if len(commonValues) < 1 {
+			return nil, fmt.Errorf("empty metrics data from BatchQueryRange")
+		}
 
 		// 转换数据结构
-		metricsValue, err = promCommonModelValue2MetricsData(commonValues)
+		tmpMetricsData, err := promCommonModelValue2MetricsData(commonValues)
 		if err != nil {
 			return nil, err
 		}
+		// 因为只有一条表达式
+		metricsData = tmpMetricsData[0]
 	}
 
 	// 获取metrics_mapping表要增加映射 panel 的字段
@@ -71,7 +77,7 @@ func FactoryAggBusiGroupMetrics(ctx *ctx.Context, busiGroupID uint, ibn, metricU
 	return &AggBusiGroupMetrics{
 		root: &busiGroupMetricsTransformer{
 			metricUniqueID: metricUniqueID,
-			metricsData:    metricsValue,
+			metricsData:    metricsData,
 			panel:          panelContent,
 		},
 	}, nil

@@ -36,8 +36,9 @@ func init() {
 }
 
 func TestListBusiGroupMetrics(t *testing.T) {
-	err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", "cpu_util")
+	data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", "cpu_util")
 	if err != nil {
 		t.Fatal(err)
 	}
+	util.LogJSON(data)
 }

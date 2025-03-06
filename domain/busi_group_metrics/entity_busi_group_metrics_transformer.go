@@ -12,7 +12,7 @@ import (
 // 将查询出来的指标和 panel 数据结合
 type busiGroupMetricsTransformer struct {
 	metricUniqueID string
-	metricsData    []metricsData
+	metricsData    metricsFromExpr
 	panel          *models.Panel
 
 	outputData []*metricsWithThresholds
@@ -26,44 +26,56 @@ func (trans *busiGroupMetricsTransformer) check() error {
 	return nil
 }
 
+func (trans *busiGroupMetricsTransformer) getColor(mValue metricsValues) (string, error) {
+	var (
+		color         string
+		thresholdsLen = len(trans.panel.Options.Thresholds.Steps)
+	)
+
+	for i := thresholdsLen - 1; i >= 0; i-- {
+		step := trans.panel.Options.Thresholds.Steps[i]
+		if step.Value == nil {
+			color = step.Color
+			break
+		}
+
+		metricValueSTR := mValue.value
+		metricValue, err := strconv.ParseFloat(strings.TrimSpace(metricValueSTR), 64)
+		if err != nil {
+			return "", err
+		}
+
+		v := *step.Value
+
+		if metricValue >= v {
+			color = step.Color
+			break
+		}
+	}
+
+	return color, nil
+}
+
 func (trans *busiGroupMetricsTransformer) combine() error {
 	if err := trans.check(); err != nil {
 		return err
 	}
 
-	thresholdsLen := len(trans.panel.Options.Thresholds.Steps)
 	for _, m := range trans.metricsData {
 		if len(m.values) < 1 {
 			return fmt.Errorf("trans.metricsData's values is empty")
 		}
 
-		var çolor string
-		for i := thresholdsLen - 1; i >= 0; i-- {
-			step := trans.panel.Options.Thresholds.Steps[i]
-			if step.Value == nil {
-				çolor = step.Color
-				break
-			}
-
-			metricValueSTR := m.values[0].value
-			metricValue, err := strconv.ParseFloat(strings.TrimSpace(metricValueSTR), 64)
-			if err != nil {
-				return err
-			}
-
-			v := *step.Value
-
-			if metricValue >= v {
-				çolor = step.Color
-				break
-			}
+		color, err := trans.getColor(m.values[0])
+		if err != nil {
+			return err
 		}
 
 		trans.outputData = append(trans.outputData, &metricsWithThresholds{
 			metricUniqueID: trans.metricUniqueID,
 			hostIP:         m.metric["host_ip"],
 			metrics:        m.values[0],
-			color:          çolor,
+			color:          color,
 		})
 	}
 
