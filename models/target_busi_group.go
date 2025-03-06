@@ -33,7 +33,7 @@ func TargetBusiGroupsGetAll(ctx *ctx.Context) (map[string][]int64, error) {
 	return tgs, nil
 }
 
-func TargetGroupIdsGetByGroupID(ctx *ctx.Context, groupID string) (targetIdent []string, err error) {
+func TargetGroupIdsGetByGroupID(ctx *ctx.Context, groupID uint) (targetIdent []string, err error) {
 	var lst []*TargetBusiGroup
 	err = DB(ctx).Where("group_id = ?", groupID).Find(&lst).Error
 	if err != nil {

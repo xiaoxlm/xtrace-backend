@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func FactoryAggBusiGroupMetrics(ctx *ctx.Context, busiGroupID, ibn, metricUniqueID string) (*AggBusiGroupMetrics, error) {
+func FactoryAggBusiGroupMetrics(ctx *ctx.Context, busiGroupID uint, ibn, metricUniqueID string) (*AggBusiGroupMetrics, error) {
 	var (
 		err            error
 		targetIdents   []string                   // 获取节点列表

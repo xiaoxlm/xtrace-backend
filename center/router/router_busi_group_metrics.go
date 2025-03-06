@@ -7,7 +7,7 @@ import (
 )
 
 type MyParams struct {
-	BusiGroupID    string `url:"id" binding:"required"`
+	BusiGroupID    uint   `url:"id" binding:"required"`
 	IBN            string `form:"ibn" binding:"required"`            // query params
 	MetricUniqueID string `form:"metricUniqueID" binding:"required"` // query params
 }
