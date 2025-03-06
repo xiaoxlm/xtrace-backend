@@ -2,24 +2,25 @@ package busi_group_metrics
 
 import (
 	"fmt"
+
 	"github.com/prometheus/common/model"
 	"github.com/sirupsen/logrus"
 )
 
-type metricsFromExpr []metricsInfo // 一个表达式得到的数据
+type MetricsFromExpr []MetricsInfo // 一个表达式得到的数据
 
-type metricsInfo struct {
-	metric map[string]string
-	values []metricsValues // 时序数值
+type MetricsInfo struct {
+	Metric map[string]string `json:"metric"`
+	Values []MetricsValues   `json:"values"` // 时序数值
 }
 
-type metricsValues struct {
-	value     string
-	timestamp int64
+type MetricsValues struct {
+	Value     string `json:"value"`
+	Timestamp int64  `json:"timestamp"`
 }
 
-func promCommonModelValue2MetricsData(promValues []model.Value) ([]metricsFromExpr, error) {
-	var ret []metricsFromExpr
+func promCommonModelValue2MetricsData(promValues []model.Value) ([]MetricsFromExpr, error) {
+	var ret []MetricsFromExpr
 
 	for _, result := range promValues {
 		mData, err := parseModelValue2metricsData(result)
@@ -33,8 +34,8 @@ func promCommonModelValue2MetricsData(promValues []model.Value) ([]metricsFromEx
 	return ret, nil
 }
 
-func parseModelValue2metricsData(commonModelValue model.Value) (metricsFromExpr, error) {
-	var ret metricsFromExpr
+func parseModelValue2metricsData(commonModelValue model.Value) (MetricsFromExpr, error) {
+	var ret MetricsFromExpr
 	switch commonModelValue.Type() {
 	case model.ValScalar:
 		logrus.Warnf("need to parse 'Scalar' type value")
@@ -43,11 +44,11 @@ func parseModelValue2metricsData(commonModelValue model.Value) (metricsFromExpr,
 	case model.ValMatrix:
 		matrix := commonModelValue.(model.Matrix)
 		for _, sample := range matrix {
-			var values []metricsValues
+			var values []MetricsValues
 			for _, value := range sample.Values {
-				values = append(values, metricsValues{
-					value:     value.Value.String(),
-					timestamp: value.Timestamp.Unix(),
+				values = append(values, MetricsValues{
+					Value:     value.Value.String(),
+					Timestamp: value.Timestamp.Unix(),
 				})
 			}
 
@@ -56,9 +57,9 @@ func parseModelValue2metricsData(commonModelValue model.Value) (metricsFromExpr,
 				m[string(k)] = string(v)
 			}
 
-			ret = append(ret, metricsInfo{
-				metric: m,
-				values: values,
+			ret = append(ret, MetricsInfo{
+				Metric: m,
+				Values: values,
 			})
 		}
 

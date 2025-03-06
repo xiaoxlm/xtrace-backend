@@ -12,10 +12,10 @@ import (
 // 将查询出来的指标和 panel 数据结合
 type busiGroupMetricsTransformer struct {
 	metricUniqueID string
-	metricsData    metricsFromExpr
+	metricsData    MetricsFromExpr
 	panel          *models.Panel
 
-	outputData []*metricsWithThresholds
+	outputData []*MetricsWithThresholds
 }
 
 func (trans *busiGroupMetricsTransformer) check() error {
@@ -26,7 +26,7 @@ func (trans *busiGroupMetricsTransformer) check() error {
 	return nil
 }
 
-func (trans *busiGroupMetricsTransformer) getColor(mValue metricsValues) (string, error) {
+func (trans *busiGroupMetricsTransformer) getColor(mValue MetricsValues) (string, error) {
 	var (
 		color         string
 		thresholdsLen = len(trans.panel.Options.Thresholds.Steps)
@@ -39,7 +39,7 @@ func (trans *busiGroupMetricsTransformer) getColor(mValue metricsValues) (string
 			break
 		}
 
-		metricValueSTR := mValue.value
+		metricValueSTR := mValue.Value
 		metricValue, err := strconv.ParseFloat(strings.TrimSpace(metricValueSTR), 64)
 		if err != nil {
 			return "", err
@@ -62,36 +62,37 @@ func (trans *busiGroupMetricsTransformer) combine() error {
 	}
 
 	for _, m := range trans.metricsData {
-		if len(m.values) < 1 {
+		if len(m.Values) < 1 {
 			return fmt.Errorf("trans.metricsData's values is empty")
 		}
 
-		color, err := trans.getColor(m.values[0])
+		color, err := trans.getColor(m.Values[0])
 		if err != nil {
 			return err
 		}
 
-		trans.outputData = append(trans.outputData, &metricsWithThresholds{
-			metricUniqueID: trans.metricUniqueID,
-			hostIP:         m.metric["host_ip"],
-			metrics:        m.values[0],
-			color:          color,
+		trans.outputData = append(trans.outputData, &MetricsWithThresholds{
+			MetricUniqueID: trans.metricUniqueID,
+			HostIP:         m.Metric["host_ip"],
+			Metrics:        m.Values[0],
+			Color:          color,
 		})
 	}
 
 	return nil
 }
 
-func (trans *busiGroupMetricsTransformer) listData() ([]*metricsWithThresholds, error) {
+func (trans *busiGroupMetricsTransformer) listData() ([]*MetricsWithThresholds, error) {
 	if err := trans.combine(); err != nil {
 		return nil, err
 	}
 	return trans.outputData, nil
 }
 
-type metricsWithThresholds struct {
-	metricUniqueID string
-	hostIP         string
-	metrics        metricsValues
-	color          string
+type MetricsWithThresholds struct {
+	MetricUniqueID string `json:"metricUniqueID"`
+	HostIP         string `json:"hostIP"`
+	Metrics        MetricsValues `json:"metrics"`
+	Color          string        `json:"color"`
 }
+

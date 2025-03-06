@@ -29,7 +29,7 @@ func FactoryAggBusiGroupMetrics(ctx *ctx.Context, busiGroupID uint, ibn, metricU
 	}
 
 	// 根据表达式获取指标数据
-	var metricsData metricsFromExpr
+	var metricsData MetricsFromExpr
 	{
 		// 解析表达式
 		exprVO, err := newBusiGroupMetricsExpr(metricsMapping.Expression, ibn, targetIdents)
