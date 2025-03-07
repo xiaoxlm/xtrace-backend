@@ -22,6 +22,15 @@ type MetricsMapping struct {
 	gorm.DeletedAt
 }
 
+func (m MetricsMapping) LabelsToStringMap() map[string]string {
+	ret := make(map[string]string)
+	for k, v := range m.Labels {
+		ret[k] = v.(string)
+	}
+
+	return ret
+}
+
 func (MetricsMapping) TableName() string {
 	return "metrics_mapping"
 }

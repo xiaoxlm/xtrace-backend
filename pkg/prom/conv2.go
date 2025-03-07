@@ -2,13 +2,14 @@ package prom
 
 import (
 	"fmt"
+
 	"github.com/prometheus/common/model"
 	"github.com/sirupsen/logrus"
 )
 
 type MetricsFromExpr []MetricsInfo // 一个表达式得到的数据
 
-type MetricsInfo struct {
+type MetricsInfo struct { // 具体某个时序数据，比如GPU0
 	Metric map[string]string `json:"metric"`
 	Values []MetricsValues   `json:"values"` // 时序数值
 }
@@ -16,13 +17,14 @@ type MetricsInfo struct {
 type MetricsValues struct {
 	Value     string `json:"value"`
 	Timestamp int64  `json:"timestamp"`
+	Color     string `json:"color"`
 }
 
 func PromCommonModelValue(promValues []model.Value) ([]MetricsFromExpr, error) {
 	var ret []MetricsFromExpr
 
 	for _, result := range promValues {
-		mData, err := parseModelValue2MetricsData(result)
+		mData, err := ParseModelValue2MetricsData(result)
 		if err != nil {
 			return nil, err
 		}
@@ -33,7 +35,8 @@ func PromCommonModelValue(promValues []model.Value) ([]MetricsFromExpr, error) {
 	return ret, nil
 }
 
-func parseModelValue2MetricsData(commonModelValue model.Value) (MetricsFromExpr, error) {
+// 一个表达式得到的数据
+func ParseModelValue2MetricsData(commonModelValue model.Value) (MetricsFromExpr, error) {
 	var ret MetricsFromExpr
 	switch commonModelValue.Type() {
 	case model.ValScalar:

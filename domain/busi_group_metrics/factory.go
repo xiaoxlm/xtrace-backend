@@ -2,12 +2,14 @@ package busi_group_metrics
 
 import (
 	"fmt"
+	"github.com/prometheus/common/model"
+	"time"
+
 	"github.com/ccfos/nightingale/v6/center/service/prometheus"
 	"github.com/ccfos/nightingale/v6/models"
 	prometheus2 "github.com/ccfos/nightingale/v6/models/prometheus"
 	"github.com/ccfos/nightingale/v6/pkg/ctx"
 	"github.com/ccfos/nightingale/v6/pkg/prom"
-	"time"
 )
 
 func FactoryAggBusiGroupMetrics(ctx *ctx.Context, busiGroupID uint, ibn, metricUniqueID string) (*AggBusiGroupMetrics, error) {
@@ -82,5 +84,70 @@ func FactoryAggBusiGroupMetrics(ctx *ctx.Context, busiGroupID uint, ibn, metricU
 			metricsData:    metricsData,
 			panel:          panelContent,
 		},
+	}, nil
+}
+
+func factoryMetricsMappingEntity(ctx *ctx.Context, busiGroupID uint, ibn, metricUniqueID string) (*metricsMappingEntity, error) {
+	var (
+		err            error
+		metricsMapping = &models.MetricsMapping{} // 根据metricUniqueID，获取监控
+		exprVO         = &busiGroupMetricsExpr{}
+	)
+	{
+		targetIdents, tErr := models.TargetGroupIdsGetByGroupID(ctx, busiGroupID)
+		if tErr != nil {
+			return nil, err
+		}
+
+		metricsMapping, err = models.MetricsMappingGetByMetricUniqueID(ctx, metricUniqueID)
+		if err != nil {
+			return nil, err
+		}
+
+		// 解析表达式
+		exprVO, err = newBusiGroupMetricsExpr(metricsMapping.Expression, ibn, targetIdents)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var (
+		panel           = &models.Panel{}
+		metricsFromProm model.Value
+	)
+	{
+		promAddr, err := prometheus.GetPrometheusSource(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		// 获取指标数据
+		parsedExpr := exprVO.getParsedExpr()
+		commonValues, err := prometheus2.NewPrometheus(promAddr).BatchQueryRange(ctx.Ctx, []prometheus2.QueryFormItem{
+			{
+				Start: time.Now().Unix(),
+				End:   time.Now().Unix(),
+				Step:  15,
+				Query: parsedExpr,
+			},
+		})
+		if len(commonValues) < 1 {
+			return nil, fmt.Errorf("commonValues is empty")
+		}
+		metricsFromProm = commonValues[0]
+
+		panel, err = models.GetPanelContent(ctx, metricsMapping.BoardPayloadID, metricsMapping.PanelID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &metricsMappingEntity{
+		metricUniqueID:  metricUniqueID,
+		labels:          metricsMapping.LabelsToStringMap(),
+		desc:            metricsMapping.Desc,
+		category:        metricsMapping.Category,
+		panel:           panel,
+		metricsFromProm: metricsFromProm,
 	}, nil
 }
