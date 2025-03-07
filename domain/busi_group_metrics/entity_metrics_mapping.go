@@ -2,12 +2,9 @@ package busi_group_metrics
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
-
 	"github.com/ccfos/nightingale/v6/models"
 
-	"github.com/ccfos/nightingale/v6/pkg/prom"
+	"github.com/lie-flat-planet/httputil"
 	"github.com/prometheus/common/model"
 )
 
@@ -21,7 +18,7 @@ type metricsMappingEntity struct {
 
 	// need to convert
 	multiMetricsData bool // 一个表达式是否会有多个值
-	metricsData      prom.MetricsFromExpr
+	metricsData      httputil.MetricsFromExpr
 }
 
 func newMetricsMappingEntity(metricUniqueID string, labels map[string]string, desc string, category string, panel *models.Panel, metricsFromProm model.Value) (*metricsMappingEntity, error) {
@@ -68,7 +65,7 @@ func (m *metricsMappingEntity) entry() error {
 
 // 将prom的model.Value转换为metricsData
 func (m *metricsMappingEntity) parseToMetricsData() error {
-	metricsData, err := prom.ParseModelValue2MetricsData(m.metricsFromProm)
+	metricsData, err := httputil.ParseModelValue2MetricsData(m.metricsFromProm)
 	if err != nil {
 		return err
 	}
@@ -93,7 +90,7 @@ func (m *metricsMappingEntity) setMetricsDataColor() error {
 	return nil
 }
 
-func (m *metricsMappingEntity) setColorByMetricsValues(mValue *prom.MetricsValues) error {
+func (m *metricsMappingEntity) setColorByMetricsValues(mValue *httputil.MetricsValues) error {
 	var (
 		color         string
 		thresholdsLen = len(m.panel.Options.Thresholds.Steps)
@@ -105,16 +102,9 @@ func (m *metricsMappingEntity) setColorByMetricsValues(mValue *prom.MetricsValue
 			color = step.Color
 			break
 		}
-
-		metricValueSTR := mValue.Value
-		metricValue, err := strconv.ParseFloat(strings.TrimSpace(metricValueSTR), 64)
-		if err != nil {
-			return err
-		}
-
 		v := *step.Value
 
-		if metricValue >= v {
+		if mValue.Value >= v {
 			color = step.Color
 			break
 		}
