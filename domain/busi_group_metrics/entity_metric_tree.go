@@ -1,8 +1,8 @@
 package busi_group_metrics
 
 type entityMetricTreeEntity struct {
-	avg *metricsMappingEntity
-	//children *metricsMappingEntity
+	avg   *metricsMappingEntity
+	child *metricsMappingEntity
 }
 
 func (entity *entityMetricTreeEntity) listAvgData() ([]*MetricsWithThresholds, error) {

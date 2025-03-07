@@ -7,5 +7,5 @@ type MetricsWithThresholds struct {
 	MetricDesc     string                   `json:"metricDesc"`
 	HostIP         string                   `json:"hostIP"`
 	Metrics        prom.MetricsValues       `json:"metrics"`
-	Child          []*MetricsWithThresholds `json:"-"` // TODO
+	Child          []*MetricsWithThresholds `json:"child"` // TODO
 }
