@@ -1,9 +1,9 @@
 package busi_group_metrics
 
 type AggBusiGroupMetrics struct {
-	root *busiGroupMetricsTransformer
+	root *entityMetricTreeEntity
 }
 
-func (agg *AggBusiGroupMetrics) FormData() ([]*MetricsWithThresholds, error) {
-	return agg.root.listData()
+func (agg *AggBusiGroupMetrics) ListMetrics() ([]*MetricsWithThresholds, error) {
+	return agg.root.listAvgData()
 }

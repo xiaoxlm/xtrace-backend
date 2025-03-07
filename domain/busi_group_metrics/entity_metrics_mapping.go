@@ -24,10 +24,43 @@ type metricsMappingEntity struct {
 	metricsData      prom.MetricsFromExpr
 }
 
+func newMetricsMappingEntity(metricUniqueID string, labels map[string]string, desc string, category string, panel *models.Panel, metricsFromProm model.Value) (*metricsMappingEntity, error) {
+	entity := &metricsMappingEntity{
+		metricUniqueID:  metricUniqueID,
+		labels:          labels,
+		desc:            desc,
+		category:        category,
+		panel:           panel,
+		metricsFromProm: metricsFromProm,
+	}
+
+	if entity.metricUniqueID == "cpu_avg_util" {
+		entity.multiMetricsData = false
+	}
+
+	if err := entity.check(); err != nil {
+		return nil, err
+	}
+
+	return entity, nil
+}
+
 func (m *metricsMappingEntity) check() error {
 
 	if m.metricsFromProm == nil {
 		return fmt.Errorf("metricsFromProm is nil in metricsMappingEntity")
+	}
+
+	return nil
+}
+
+func (m *metricsMappingEntity) entry() error {
+	if err := m.parseToMetricsData(); err != nil {
+		return err
+	}
+
+	if err := m.setMetricsDataColor(); err != nil {
+		return err
 	}
 
 	return nil

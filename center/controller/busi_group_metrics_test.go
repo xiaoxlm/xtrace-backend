@@ -36,8 +36,8 @@ func init() {
 }
 
 func TestListBusiGroupMetrics(t *testing.T) {
-	t.Run("cpu_util", func(t *testing.T) {
-		data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", "cpu_util")
+	t.Run("cpu_avg_util", func(t *testing.T) {
+		data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", "cpu_avg_util")
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -11,7 +11,7 @@ func ListBusiGroupMetrics(ctx *ctx.Context, busiGroupID uint, ibn, metricUniqueI
 		return nil, err
 	}
 
-	data, err := agg.FormData()
+	data, err := agg.ListMetrics()
 	if err != nil {
 		return nil, err
 	}

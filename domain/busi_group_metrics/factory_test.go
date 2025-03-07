@@ -36,7 +36,7 @@ func init() {
 }
 
 func Test_factoryMetricsMappingEntity(t *testing.T) {
-	got, err := factoryMetricsMappingEntity(tmpCtx, 1, "算网A", "cpu_util")
+	got, err := factoryMetricsMappingEntity(tmpCtx, 1, "算网A", "cpu_avg_util")
 	if err != nil {
 		t.Fatal(err)
 	}
