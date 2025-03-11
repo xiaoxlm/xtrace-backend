@@ -37,7 +37,7 @@ func init() {
 
 func TestListBusiGroupMetrics(t *testing.T) {
 	t.Run("cpu_avg_util", func(t *testing.T) {
-		data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", "cpu_avg_util")
+		data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", "avg_cpu_util")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -53,7 +53,7 @@ func TestListBusiGroupMetrics(t *testing.T) {
 	})
 
 	t.Run("gpu_util", func(t *testing.T) {
-		data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", "gpu_util")
+		data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", "all_gpu_util")
 		if err != nil {
 			t.Fatal(err)
 		}
