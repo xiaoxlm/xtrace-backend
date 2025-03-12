@@ -29,6 +29,7 @@ func init() {
 	}
 
 	db, err := storage.New(config.DB)
+
 	if err != nil {
 		panic(err)
 	}
@@ -37,28 +38,27 @@ func init() {
 }
 
 func TestListBusiGroupMetrics(t *testing.T) {
-	t.Run("cpu_avg_util", func(t *testing.T) {
-		data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", "avg_cpu_util")
-		if err != nil {
-			t.Fatal(err)
-		}
-		util.LogJSON(data)
-	})
-
-	t.Run("mem_util", func(t *testing.T) {
-		data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", "mem_util")
-		if err != nil {
-			t.Fatal(err)
-		}
-		util.LogJSON(data)
-	})
-
 	t.Run("gpu_util", func(t *testing.T) {
-		data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", models.MetricUniqueID_Avg_Gpu_Util)
+		data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", models.MetricsUniqueName_Gpu_Util)
 		if err != nil {
 			t.Fatal(err)
 		}
 		util.LogJSON(data)
 	})
 
+	t.Run("gpu_mem_util", func(t *testing.T) {
+		data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", models.MetricsUniqueName_Gpu_Mem_Util)
+		if err != nil {
+			t.Fatal(err)
+		}
+		util.LogJSON(data)
+	})
+
+	t.Run("gpu_temp", func(t *testing.T) {
+		data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", models.MetricsUniqueName_Gpu_Temp)
+		if err != nil {
+			t.Fatal(err)
+		}
+		util.LogJSON(data)
+	})
 }
