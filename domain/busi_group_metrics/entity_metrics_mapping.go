@@ -2,6 +2,8 @@ package busi_group_metrics
 
 import (
 	"fmt"
+	"sort"
+
 	"github.com/ccfos/nightingale/v6/models"
 
 	"github.com/lie-flat-planet/httputil"
@@ -92,16 +94,15 @@ func (m *metricsMappingEntity) setMetricsDataColor() error {
 
 func (m *metricsMappingEntity) setColorByMetricsValues(mValue *httputil.MetricsValues) error {
 	var (
-		color         string
-		thresholdsLen = len(m.panel.Options.Thresholds.Steps)
+		color = "#6C53B1" // 绿色
+		steps = m.sortThresholdsStepsByValue()
 	)
 
-	for i := thresholdsLen - 1; i >= 0; i-- {
-		step := m.panel.Options.Thresholds.Steps[i]
+	for _, step := range steps {
 		if step.Value == nil {
-			color = step.Color
-			break
+			continue
 		}
+
 		v := *step.Value
 
 		if mValue.Value >= v {
@@ -112,4 +113,17 @@ func (m *metricsMappingEntity) setColorByMetricsValues(mValue *httputil.MetricsV
 
 	mValue.Color = color
 	return nil
+}
+
+func (m *metricsMappingEntity) sortThresholdsStepsByValue() []models.Step {
+	thresholdsSteps := m.panel.Options.Thresholds.Steps
+
+	sort.Slice(thresholdsSteps, func(i, j int) bool {
+		if thresholdsSteps[i].Value == nil || thresholdsSteps[j].Value == nil {
+			return false
+		}
+		return *thresholdsSteps[i].Value > *thresholdsSteps[j].Value
+	})
+
+	return thresholdsSteps
 }
