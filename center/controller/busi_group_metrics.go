@@ -2,10 +2,11 @@ package controller
 
 import (
 	"github.com/ccfos/nightingale/v6/domain/busi_group_metrics"
+	"github.com/ccfos/nightingale/v6/models"
 	"github.com/ccfos/nightingale/v6/pkg/ctx"
 )
 
-func ListBusiGroupMetrics(ctx *ctx.Context, busiGroupID uint, ibn, metricUniqueID string) ([]*busi_group_metrics.MetricsWithThresholds, error) {
+func ListBusiGroupMetrics(ctx *ctx.Context, busiGroupID uint, ibn string, metricUniqueID models.MetricUniqueID) ([]*busi_group_metrics.MetricsWithThresholds, error) {
 	agg, err := busi_group_metrics.FactoryAggBusiGroupMetrics(ctx, busiGroupID, ibn, metricUniqueID)
 	if err != nil {
 		return nil, err

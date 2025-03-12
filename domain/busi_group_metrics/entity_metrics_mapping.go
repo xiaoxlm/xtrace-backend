@@ -9,7 +9,7 @@ import (
 )
 
 type metricsMappingEntity struct {
-	metricUniqueID  string
+	metricUniqueID  models.MetricUniqueID
 	labels          map[string]string
 	desc            string
 	category        string
@@ -21,7 +21,7 @@ type metricsMappingEntity struct {
 	metricsData      httputil.MetricsFromExpr
 }
 
-func newMetricsMappingEntity(metricUniqueID string, labels map[string]string, desc string, category string, panel *models.Panel, metricsFromProm model.Value) (*metricsMappingEntity, error) {
+func newMetricsMappingEntity(metricUniqueID models.MetricUniqueID, labels map[string]string, desc string, category string, panel *models.Panel, metricsFromProm model.Value) (*metricsMappingEntity, error) {
 	entity := &metricsMappingEntity{
 		metricUniqueID:  metricUniqueID,
 		labels:          labels,

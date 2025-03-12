@@ -87,7 +87,7 @@ import (
 //	}, nil
 //}
 
-func FactoryAggBusiGroupMetrics(ctx *ctx.Context, busiGroupID uint, ibn, metricUniqueID string) (*AggBusiGroupMetrics, error) {
+func FactoryAggBusiGroupMetrics(ctx *ctx.Context, busiGroupID uint, ibn string, metricUniqueID models.MetricUniqueID) (*AggBusiGroupMetrics, error) {
 	avg, err := factoryMetricsMappingEntity(ctx, busiGroupID, ibn, metricUniqueID)
 	if err != nil {
 		return nil, err
@@ -100,7 +100,7 @@ func FactoryAggBusiGroupMetrics(ctx *ctx.Context, busiGroupID uint, ibn, metricU
 	}, nil
 }
 
-func factoryMetricsMappingEntity(ctx *ctx.Context, busiGroupID uint, ibn, metricUniqueID string) (*metricsMappingEntity, error) {
+func factoryMetricsMappingEntity(ctx *ctx.Context, busiGroupID uint, ibn string, metricUniqueID models.MetricUniqueID) (*metricsMappingEntity, error) {
 	var (
 		err            error
 		metricsMapping = &models.MetricsMapping{} // 根据metricUniqueID，获取监控

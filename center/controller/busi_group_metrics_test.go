@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"github.com/ccfos/nightingale/v6/conf"
+	"github.com/ccfos/nightingale/v6/models"
 	n9eCtx "github.com/ccfos/nightingale/v6/pkg/ctx"
 	"github.com/ccfos/nightingale/v6/pkg/util"
 	"github.com/ccfos/nightingale/v6/storage"
@@ -53,7 +54,7 @@ func TestListBusiGroupMetrics(t *testing.T) {
 	})
 
 	t.Run("gpu_util", func(t *testing.T) {
-		data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", "all_gpu_util")
+		data, err := ListBusiGroupMetrics(tmpCtx, 1, "算网A", models.MetricUniqueID_Avg_Gpu_Util)
 		if err != nil {
 			t.Fatal(err)
 		}
