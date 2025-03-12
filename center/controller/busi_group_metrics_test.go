@@ -62,3 +62,16 @@ func TestListBusiGroupMetrics(t *testing.T) {
 		util.LogJSON(data)
 	})
 }
+
+func TestListMetricsAggr(t *testing.T) {
+	list, err := ListMetricsAggr(tmpCtx, models.MetricsAggr{
+		Category: models.MetricsCategory_Gpu,
+		Desc:     "",
+	})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	util.LogJSON(list)
+}

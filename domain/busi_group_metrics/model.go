@@ -12,3 +12,10 @@ type MetricsWithThresholds struct {
 	Metrics        httputil.MetricsValues   `json:"metrics"`
 	Child          []*MetricsWithThresholds `json:"child,omitempty"` // TODO
 }
+
+type MetricsAggr struct {
+	ID         uint   `json:"id"`
+	UniqueName string `json:"uniqueName"`
+	Desc       string `json:"desc"`
+	Category   string `json:"category"`
+}

@@ -2,18 +2,21 @@ package busi_group_metrics
 
 import (
 	"fmt"
+	"github.com/toolkits/pkg/logger"
 	"regexp"
 	"strings"
 )
 
 type busiGroupMetricsExpr struct {
+	busiGroupID  uint
 	originalExpr string
 	ibn          string
 	hostIPs      []string
 }
 
-func newBusiGroupMetricsExpr(originalExpr string, ibn string, hostIPs []string) (*busiGroupMetricsExpr, error) {
+func newBusiGroupMetricsExpr(busiGroupID uint, originalExpr string, ibn string, hostIPs []string) (*busiGroupMetricsExpr, error) {
 	b := &busiGroupMetricsExpr{
+		busiGroupID:  busiGroupID,
 		originalExpr: originalExpr,
 		ibn:          ibn,
 		hostIPs:      hostIPs,
@@ -28,7 +31,7 @@ func newBusiGroupMetricsExpr(originalExpr string, ibn string, hostIPs []string) 
 
 func (metrics *busiGroupMetricsExpr) check() error {
 	if len(metrics.hostIPs) < 1 {
-		return fmt.Errorf("hostIPs is empty in BusiGroupMetrics")
+		logger.Warningf("hostIPs is empty by busiGroupID= %d", metrics.busiGroupID)
 	}
 
 	return nil

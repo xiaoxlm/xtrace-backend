@@ -3,8 +3,9 @@ package models
 import (
 	"database/sql/driver"
 	"fmt"
-	"github.com/ccfos/nightingale/v6/pkg/ctx"
 	"time"
+
+	"github.com/ccfos/nightingale/v6/pkg/ctx"
 
 	"gorm.io/datatypes"
 
@@ -17,7 +18,7 @@ type MetricsAggr struct {
 	UniqueName      string                              `json:"uniqueName" gorm:"unique;size:255"`
 	Desc            string                              `json:"desc" gorm:"size:255"`
 	MetricUniqueIDs datatypes.JSONSlice[MetricUniqueID] `json:"metricUniqueIDs"`
-	Category        string                              `json:"category"` // 类别
+	Category        MetricsCategory                     `json:"category"` // 类别
 	CreatedAt       DateTime                            `json:"createdAt" gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt       DateTime                            `json:"updatedAt" gorm:"default:CURRENT_TIMESTAMP"`
 	gorm.DeletedAt
@@ -34,6 +35,22 @@ func MetricsAggrGetByUniqueName(ctx *ctx.Context, uniqueName MetricsUniqueName) 
 	var ma = MetricsAggr{}
 	err := DB(ctx).Where("unique_name = ?", uniqueName).First(&ma).Error
 	return &ma, err
+}
+
+func MetricsAggrList(ctx *ctx.Context, search MetricsAggr) ([]*MetricsAggr, error) {
+	db := DB(ctx).Where("id > ?", 0)
+
+	if search.Category != "" {
+		db = db.Where("category = ?", search.Category)
+	}
+
+	if search.Desc != "" {
+		db = db.Where("desc like ?", "%"+search.Desc+"%")
+	}
+
+	var list []*MetricsAggr
+	err := db.Find(&list).Error
+	return list, err
 }
 
 type MetricsUniqueName string
@@ -69,3 +86,9 @@ func (t *DateTime) Scan(value interface{}) error {
 func (t DateTime) Value() (driver.Value, error) {
 	return t.Time, nil
 }
+
+type MetricsCategory string
+
+const (
+	MetricsCategory_Gpu MetricsCategory = "gpu"
+)

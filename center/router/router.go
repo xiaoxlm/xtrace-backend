@@ -288,6 +288,7 @@ func (rt *Router) Config(r *gin.Engine) {
 		pages.DELETE("/busi-group/:id", rt.auth(), rt.user(), rt.perm("/busi-groups/del"), rt.bgrw(), rt.busiGroupDel)
 		pages.GET("/busi-group/:id/perm/:perm", rt.auth(), rt.user(), rt.checkBusiGroupPerm)
 		pages.GET("/busi-group/:id/metrics", rt.auth(), rt.user(), rt.listBusiGroupMetrics)
+		pages.GET("/metrics-aggr", rt.auth(), rt.user(), rt.listMetricsAggr)
 
 		pages.GET("/targets", rt.auth(), rt.user(), rt.targetGets)
 		pages.GET("/target/extra-meta", rt.auth(), rt.user(), rt.targetExtendInfoByIdent)

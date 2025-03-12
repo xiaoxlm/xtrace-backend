@@ -118,7 +118,7 @@ func factoryMetricsMappingEntity(ctx *ctx.Context, busiGroupID uint, ibn string,
 		}
 
 		// 解析表达式
-		exprVO, err = newBusiGroupMetricsExpr(metricsMapping.Expression, ibn, targetIdents)
+		exprVO, err = newBusiGroupMetricsExpr(busiGroupID, metricsMapping.Expression, ibn, targetIdents)
 		if err != nil {
 			return nil, err
 		}

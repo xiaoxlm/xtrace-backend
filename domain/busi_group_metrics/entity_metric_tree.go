@@ -7,10 +7,10 @@ type entityMetricTreeEntity struct {
 
 func (entity *entityMetricTreeEntity) listAvgData() ([]*MetricsWithThresholds, error) {
 	if err := entity.avg.entry(); err != nil {
-		return nil, err 
+		return nil, err
 	}
 
-	var ret []*MetricsWithThresholds
+	var ret = make([]*MetricsWithThresholds, 0)
 	for _, data := range entity.avg.metricsData {
 		ret = append(ret, &MetricsWithThresholds{
 			MetricUniqueID: entity.avg.metricUniqueID,
