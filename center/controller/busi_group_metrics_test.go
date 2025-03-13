@@ -66,7 +66,7 @@ func TestListBusiGroupMetrics(t *testing.T) {
 func TestListMetricsAggr(t *testing.T) {
 	list, err := ListMetricsAggr(tmpCtx, models.MetricsAggr{
 		Category: models.MetricsCategory_Gpu,
-		Desc:     "",
+		Desc:     "内存",
 	})
 
 	if err != nil {

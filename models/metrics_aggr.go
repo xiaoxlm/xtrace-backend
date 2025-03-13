@@ -45,7 +45,7 @@ func MetricsAggrList(ctx *ctx.Context, search MetricsAggr) ([]*MetricsAggr, erro
 	}
 
 	if search.Desc != "" {
-		db = db.Where("desc like ?", "%"+search.Desc+"%")
+		db = db.Where("`desc` like ?", "%"+search.Desc+"%")
 	}
 
 	var list []*MetricsAggr
