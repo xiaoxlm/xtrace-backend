@@ -94,7 +94,7 @@ func (m *metricsMappingEntity) setMetricsDataColor() error {
 
 func (m *metricsMappingEntity) setColorByMetricsValues(mValue *httputil.MetricsValues) error {
 	var (
-		color = "#6C53B1" // 绿色
+		color = "#3FC453" // 绿色
 		steps = m.sortThresholdsStepsByValue()
 	)
 
