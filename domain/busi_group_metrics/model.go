@@ -6,11 +6,12 @@ import (
 )
 
 type MetricsWithThresholds struct {
-	MetricUniqueID models.MetricUniqueID    `json:"metricUniqueID"`
-	MetricDesc     string                   `json:"metricDesc"`
-	HostIP         string                   `json:"hostIP"`
-	Metrics        httputil.MetricsValues   `json:"metrics"`
-	Child          []*MetricsWithThresholds `json:"child,omitempty"` // TODO
+	MetricUniqueID    models.MetricUniqueID    `json:"metricUniqueID"`
+	MetricDesc        string                   `json:"metricDesc"`
+	MetricMappingDesc string                   `json:"metricMappingDesc"`
+	HostIP            string                   `json:"hostIP"`
+	Metrics           httputil.MetricsValues   `json:"metrics"`
+	Child             []*MetricsWithThresholds `json:"child,omitempty"` // TODO
 }
 
 type MetricsAggr struct {

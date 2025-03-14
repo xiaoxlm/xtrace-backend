@@ -5,7 +5,7 @@ type entityMetricTreeEntity struct {
 	child *metricsMappingEntity
 }
 
-func (entity *entityMetricTreeEntity) listAvgData() ([]*MetricsWithThresholds, error) {
+func (entity *entityMetricTreeEntity) listAvgData(metricsAggrDesc string) ([]*MetricsWithThresholds, error) {
 	if err := entity.avg.entry(); err != nil {
 		return nil, err
 	}
@@ -13,11 +13,12 @@ func (entity *entityMetricTreeEntity) listAvgData() ([]*MetricsWithThresholds, e
 	var ret = make([]*MetricsWithThresholds, 0)
 	for _, data := range entity.avg.metricsData {
 		ret = append(ret, &MetricsWithThresholds{
-			MetricUniqueID: entity.avg.metricUniqueID,
-			MetricDesc:     entity.avg.desc,
-			HostIP:         data.Metric["host_ip"],
-			Metrics:        data.Values[0],
-			Child:          nil,
+			MetricUniqueID:    entity.avg.metricUniqueID,
+			MetricDesc:        metricsAggrDesc,
+			MetricMappingDesc: entity.avg.desc,
+			HostIP:            data.Metric["host_ip"],
+			Metrics:           data.Values[0],
+			Child:             nil,
 		})
 	}
 

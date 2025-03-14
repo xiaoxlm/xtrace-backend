@@ -27,18 +27,18 @@ func ListMetricsAggr(ctx *ctx.Context, search models.MetricsAggr) ([]*busi_group
 
 func ListBusiGroupMetrics(ctx *ctx.Context, busiGroupID uint, ibn string, uniqueName models.MetricsUniqueName) ([]*busi_group_metrics.MetricsWithThresholds, error) {
 
-	aggr, err := models.MetricsAggrGetByUniqueName(ctx, uniqueName)
+	metricsAggr, err := models.MetricsAggrGetByUniqueName(ctx, uniqueName)
 	if err != nil {
 		return nil, err
 	}
 
 	// TODO child
-	agg, err := busi_group_metrics.FactoryAggBusiGroupMetrics(ctx, busiGroupID, ibn, aggr.MetricUniqueIDs[0])
+	agg, err := busi_group_metrics.FactoryAggBusiGroupMetrics(ctx, busiGroupID, ibn, metricsAggr.MetricUniqueIDs[0])
 	if err != nil {
 		return nil, err
 	}
 
-	data, err := agg.ListMetrics()
+	data, err := agg.ListMetrics(metricsAggr.Desc)
 	if err != nil {
 		return nil, err
 	}

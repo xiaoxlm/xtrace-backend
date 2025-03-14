@@ -4,6 +4,6 @@ type AggBusiGroupMetrics struct {
 	root *entityMetricTreeEntity
 }
 
-func (agg *AggBusiGroupMetrics) ListMetrics() ([]*MetricsWithThresholds, error) {
-	return agg.root.listAvgData()
+func (agg *AggBusiGroupMetrics) ListMetrics(metricsAggrDesc string) ([]*MetricsWithThresholds, error) {
+	return agg.root.listAvgData(metricsAggrDesc)
 }
