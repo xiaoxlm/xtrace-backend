@@ -67,6 +67,26 @@ type QueryFormItem struct {
 	Query string `json:"query"` // 查询语句
 }
 
+func (p *Prometheus) QueryRange(ctx context.Context, query QueryFormItem) (model.Value, error) {
+	conf := api.Config{
+		Address: p.addr,
+	}
+	client, err := api.NewClient(conf)
+	if err != nil {
+		return nil, err
+	}
+
+	r := prometheus_v1.Range{
+		Start: time.Unix(query.Start, 0),
+		End:   time.Unix(query.End, 0),
+		Step:  time.Duration(query.Step) * time.Second,
+	}
+
+	resp, _, err := prometheus_v1.NewAPI(client).QueryRange(ctx, query.Query, r)
+
+	return resp, err
+}
+
 func (p *Prometheus) BatchQueryRange(ctx context.Context, queries []QueryFormItem) ([]model.Value, error) {
 	var list []model.Value
 

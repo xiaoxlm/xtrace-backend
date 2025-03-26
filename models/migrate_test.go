@@ -32,7 +32,7 @@ func init() {
 }
 
 func TestMigrate(t *testing.T) {
-	err := gormDB.AutoMigrate(&MetricsAggr{})
+	err := gormDB.AutoMigrate(&MetricsMapping{})
 	if err != nil {
 		t.Fatal(err)
 	}
