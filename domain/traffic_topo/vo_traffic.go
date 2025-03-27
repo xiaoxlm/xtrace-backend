@@ -26,7 +26,24 @@ type VoTraffic struct {
 	outMetricsData httputil.MetricsFromExpr
 }
 
+func newVoTraffic(ibn, hostIP string, labels models.LabelExpressionSlice, connect *models.Connect, inPromql, outPromql string) *VoTraffic {
+	vo := &VoTraffic{
+		ibn:       ibn,
+		hostIP:    hostIP,
+		labels:    labels,
+		connect:   connect,
+		inPromql:  inPromql,
+		outPromql: outPromql,
+	}
+
+	return vo
+}
+
 func (vo *VoTraffic) getMetricsData(ctx *ctx.Context) error {
+	if vo.isRoot() {
+		return nil
+	}
+
 	promAddr, err := prometheus.GetPrometheusSource(ctx)
 	if err != nil {
 		return err
@@ -68,6 +85,10 @@ func (vo *VoTraffic) getMetricsData(ctx *ctx.Context) error {
 }
 
 func (vo *VoTraffic) completePromql() error {
+	if vo.isRoot() {
+		return nil
+	}
+
 	var labelExpressions = ""
 
 	for _, l := range vo.labels {
@@ -80,6 +101,9 @@ func (vo *VoTraffic) completePromql() error {
 			l.Value = vo.connect.SelfPortDevice
 		case PromLabelName_IfName:
 			l.Value = vo.connect.SelfPortDevice
+		case PromLabelName_ExportedInstance:
+			l.Value = vo.hostIP
+
 		}
 
 		str, err := l.ToString()
@@ -94,4 +118,26 @@ func (vo *VoTraffic) completePromql() error {
 	vo.outCompletePromql = fmt.Sprintf(vo.outPromql, labelExpressions)
 
 	return nil
+}
+
+func (vo *VoTraffic) isRoot() bool {
+	return vo.connect == nil
+}
+
+func convert2TrafficDataModel(vo *VoTraffic) *trafficDataModel {
+	if vo.isRoot() {
+		return &trafficDataModel{
+			HostIP:         vo.hostIP,
+			InMetricsData:  make(httputil.MetricsFromExpr, 0),
+			OutMetricsData: make(httputil.MetricsFromExpr, 0),
+		}
+	}
+
+	return &trafficDataModel{
+		HostIP:         vo.hostIP,
+		PortDevice:     vo.connect.SelfPortDevice,
+		ParentIP:       vo.connect.ParentIP,
+		InMetricsData:  vo.inMetricsData,
+		OutMetricsData: vo.outMetricsData,
+	}
 }

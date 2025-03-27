@@ -4,11 +4,16 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"github.com/ccfos/nightingale/v6/pkg/ctx"
 	"gorm.io/gorm"
 	"strings"
 )
 
 type TrafficTopoType string
+
+func (t TrafficTopoType) String() string {
+	return string(t)
+}
 
 const (
 	TrafficTopoType_Spine TrafficTopoType = "spine"
@@ -27,6 +32,16 @@ type TrafficTopo struct {
 	CreatedAt DateTime             `json:"createdAt" gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt DateTime             `json:"updatedAt" gorm:"default:CURRENT_TIMESTAMP"`
 	gorm.DeletedAt
+}
+
+func TrafficTopoListAll(ctx *ctx.Context) ([]*TrafficTopo, error) {
+	ret := make([]*TrafficTopo, 0)
+
+	db := DB(ctx).Where("id > ?", 0)
+
+	err := db.Find(&ret).Error
+
+	return ret, err
 }
 
 type LabelExpression struct {
