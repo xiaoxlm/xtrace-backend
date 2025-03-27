@@ -51,9 +51,8 @@ func (vo *VoTraffic) getMetricsData(ctx *ctx.Context) error {
 	}
 
 	// 获取指标数据
-	startTime := time.Now().Unix()
-	endTime := time.Now().Unix()
-
+	var startTime int64 = time.Now().Unix()
+	var endTime int64 = time.Now().Unix()
 	inData, err := prometheus2.NewPrometheus(promAddr).QueryRange(ctx.Ctx, prometheus2.QueryFormItem{
 		Start: startTime,
 		End:   endTime,

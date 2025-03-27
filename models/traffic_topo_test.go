@@ -46,7 +46,7 @@ func TestTrafficTopo(t *testing.T) {
 					},
 				},
 				InPromql:  "rate(node_infiniband_port_data_received_bytes_total{%s}[15s])",
-				OutPromql: "-rate(node_infiniband_port_data_transmitted_bytes_total{%s}[15s])",
+				OutPromql: "rate(node_infiniband_port_data_transmitted_bytes_total{%s}[15s])",
 				Labels: LabelExpressionSlice{
 					{
 						Label:    "IBN",
@@ -75,7 +75,7 @@ func TestTrafficTopo(t *testing.T) {
 					},
 				},
 				InPromql:  "rate(node_infiniband_port_data_received_bytes_total{%s}[15s])",
-				OutPromql: "-rate(node_infiniband_port_data_transmitted_bytes_total{%s}[15s])",
+				OutPromql: "rate(node_infiniband_port_data_transmitted_bytes_total{%s}[15s])",
 				Labels: LabelExpressionSlice{
 					{
 						Label:    "IBN",
@@ -108,7 +108,7 @@ func TestTrafficTopo(t *testing.T) {
 					},
 				},
 				InPromql:  "rate(ifHCInOctets_total{%s}[15s])",
-				OutPromql: "-rate(ifHCOutOctets_total{%s}[15s])",
+				OutPromql: "rate(ifHCOutOctets_total{%s}[15s])",
 				Labels: LabelExpressionSlice{
 					{
 						Label:    "IBN",
@@ -132,7 +132,7 @@ func TestTrafficTopo(t *testing.T) {
 				Type:      TrafficTopoType_Spine,
 				Connects:  nil,
 				InPromql:  "rate(ifHCInOctets_total{%s}[15s])",
-				OutPromql: "-rate(ifHCOutOctets_total{%s}[15s])",
+				OutPromql: "rate(ifHCOutOctets_total{%s}[15s])",
 				Labels: LabelExpressionSlice{
 					{
 						Label:    "IBN",
@@ -156,7 +156,7 @@ func TestTrafficTopo(t *testing.T) {
 				Type:      TrafficTopoType_Spine,
 				Connects:  nil,
 				InPromql:  "rate(ifHCInOctets_total{%s}[15s])",
-				OutPromql: "-rate(ifHCOutOctets_total{%s}[15s])",
+				OutPromql: "rate(ifHCOutOctets_total{%s}[15s])",
 				Labels: LabelExpressionSlice{
 					{
 						Label:    "IBN",
