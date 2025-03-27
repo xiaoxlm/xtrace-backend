@@ -8,6 +8,9 @@ type trafficDataModel struct {
 	ParentIP       string                   `json:"parentIP"`
 	InMetricsData  httputil.MetricsFromExpr `json:"inMetricsData"`
 	OutMetricsData httputil.MetricsFromExpr `json:"outMetricsData"`
+
+	InExpr  string `json:"-"`
+	OutExpr string `json:"-"`
 }
 
 type NodeTrafficData struct {

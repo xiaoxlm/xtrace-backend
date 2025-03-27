@@ -8,6 +8,7 @@ import (
 	"github.com/ccfos/nightingale/v6/pkg/ctx"
 	"github.com/lie-flat-planet/httputil"
 	"github.com/prometheus/common/model"
+	"strings"
 	"time"
 )
 
@@ -114,6 +115,8 @@ func (vo *VoTraffic) completePromql() error {
 		labelExpressions += str + ","
 	}
 
+	labelExpressions = strings.TrimRight(labelExpressions, ",")
+
 	vo.inCompletePromql = fmt.Sprintf(vo.inPromql, labelExpressions)
 	vo.outCompletePromql = fmt.Sprintf(vo.outPromql, labelExpressions)
 
@@ -139,5 +142,7 @@ func convert2TrafficDataModel(vo *VoTraffic) *trafficDataModel {
 		ParentIP:       vo.connect.ParentIP,
 		InMetricsData:  vo.inMetricsData,
 		OutMetricsData: vo.outMetricsData,
+		InExpr:         vo.inCompletePromql,
+		OutExpr:        vo.outCompletePromql,
 	}
 }
