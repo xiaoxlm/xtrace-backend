@@ -5,11 +5,11 @@ import (
 	"github.com/ccfos/nightingale/v6/pkg/ctx"
 )
 
-func ListTrafficData(ctx *ctx.Context, ibn string) ([]*traffic_topo.NodeTrafficData, error) {
+func ListTrafficData(ctx *ctx.Context, ibn string, startTime, endTime int64) ([]*traffic_topo.NodeTrafficData, error) {
 	agg, err := traffic_topo.FactoryAgg(ctx, ibn)
 	if err != nil {
 		return nil, err
 	}
 
-	return agg.ListTrafficData(ctx)
+	return agg.ListTrafficData(ctx, startTime, endTime)
 }

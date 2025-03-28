@@ -12,11 +12,11 @@ func newAgg(nodes []*EntityNode) *Agg {
 	}
 }
 
-func (agg *Agg) ListTrafficData(ctx *ctx.Context) ([]*NodeTrafficData, error) {
+func (agg *Agg) ListTrafficData(ctx *ctx.Context, startTime, endTime int64) ([]*NodeTrafficData, error) {
 	var ret []*NodeTrafficData
 
 	for _, node := range agg.nodes {
-		data, err := node.export(ctx)
+		data, err := node.export(ctx, startTime, endTime)
 		if err != nil {
 			return nil, err
 		}

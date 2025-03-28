@@ -32,8 +32,8 @@ func newEntityNode(ibn string, node *models.TrafficTopo) *EntityNode {
 	}
 }
 
-func (entity *EntityNode) export(ctx *ctx.Context) (*NodeTrafficData, error) {
-	err := entity.formToParentTraffics(ctx)
+func (entity *EntityNode) export(ctx *ctx.Context, startTime, endTime int64) (*NodeTrafficData, error) {
+	err := entity.formToParentTraffics(ctx, startTime, endTime)
 	if err != nil {
 		return nil, err
 	}
@@ -41,13 +41,13 @@ func (entity *EntityNode) export(ctx *ctx.Context) (*NodeTrafficData, error) {
 	return convert2NodeTrafficData(entity), nil
 }
 
-func (entity *EntityNode) formToParentTraffics(ctx *ctx.Context) error {
+func (entity *EntityNode) formToParentTraffics(ctx *ctx.Context, startTime, endTime int64) error {
 	for _, tra := range entity.traffics {
 		if err := tra.completePromql(); err != nil {
 			return err
 		}
 
-		if err := tra.getMetricsData(ctx); err != nil {
+		if err := tra.getMetricsData(ctx, startTime, endTime); err != nil {
 			return err
 		}
 	}

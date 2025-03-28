@@ -3,12 +3,16 @@ package controller
 import (
 	"github.com/ccfos/nightingale/v6/pkg/util"
 	"testing"
+	"time"
 )
 
 func TestListTrafficData(t *testing.T) {
 	ibn := "算网A"
 
-	dataList, err := ListTrafficData(tmpCtx, ibn)
+	tim := time.Now()
+	start := tim.Unix()
+	end := tim.Unix()
+	dataList, err := ListTrafficData(tmpCtx, ibn, start, end)
 	if err != nil {
 		t.Fatal(err)
 	}

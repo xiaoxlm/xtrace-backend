@@ -9,7 +9,6 @@ import (
 	"github.com/lie-flat-planet/httputil"
 	"github.com/prometheus/common/model"
 	"strings"
-	"time"
 )
 
 type VoTraffic struct {
@@ -40,7 +39,7 @@ func newVoTraffic(ibn, hostIP string, labels models.LabelExpressionSlice, connec
 	return vo
 }
 
-func (vo *VoTraffic) getMetricsData(ctx *ctx.Context) error {
+func (vo *VoTraffic) getMetricsData(ctx *ctx.Context, startTime, endTime int64) error {
 	if vo.isRoot() {
 		return nil
 	}
@@ -51,8 +50,6 @@ func (vo *VoTraffic) getMetricsData(ctx *ctx.Context) error {
 	}
 
 	// 获取指标数据
-	var startTime int64 = time.Now().Unix()
-	var endTime int64 = time.Now().Unix()
 	inData, err := prometheus2.NewPrometheus(promAddr).QueryRange(ctx.Ctx, prometheus2.QueryFormItem{
 		Start: startTime,
 		End:   endTime,
